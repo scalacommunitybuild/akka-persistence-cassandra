@@ -68,7 +68,7 @@ class CassandraJournalSpec extends JournalSpec(CassandraJournalConfiguration.con
 
       journal ! WriteMessages(List(AtomicWrite(msg)), probe.ref, actorInstanceId)
       val err = probe.expectMsgPF() {
-        case WriteMessagesFailed(cause) => cause
+        case WriteMessagesFailed(cause, _) => cause
       }
       probe.expectMsg(WriteMessageFailure(msg, err, actorInstanceId))
 
