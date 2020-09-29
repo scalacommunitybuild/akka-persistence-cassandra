@@ -2,8 +2,7 @@ import sbt.Keys._
 import sbtassembly.AssemblyPlugin.autoImport._
 
 lazy val root = (project in file("."))
-  .enablePlugins(Common, ScalaUnidocPlugin)
-  .disablePlugins(SitePlugin)
+  .enablePlugins(Common)
   .aggregate(core, cassandraLauncher)
   .settings(
     name := "akka-persistence-cassandra-root",
@@ -69,42 +68,6 @@ lazy val cassandraBundle = (project in file("cassandra-bundle"))
     dependencyOverrides += "com.github.jbellis" % "jamm" % "0.3.3", // See jamm comment in https://issues.apache.org/jira/browse/CASSANDRA-9608
     target in assembly := target.value / "bundle" / "akka" / "persistence" / "cassandra" / "launcher",
     assemblyJarName in assembly := "cassandra-bundle.jar")
-
-lazy val docs = project
-  .enablePlugins(Common, AkkaParadoxPlugin, ParadoxSitePlugin, PreprocessPlugin, PublishRsyncPlugin)
-  .settings(
-    name := "Akka Persistence Cassandra",
-    publish / skip := true,
-    whitesourceIgnore := true,
-    makeSite := makeSite.dependsOn(LocalRootProject / ScalaUnidoc / doc).value,
-    previewPath := (Paradox / siteSubdirName).value,
-    Preprocess / siteSubdirName := s"api/akka-persistence-cassandra/${if (isSnapshot.value) "snapshot"
-      else version.value}",
-    Preprocess / sourceDirectory := (LocalRootProject / ScalaUnidoc / unidoc / target).value,
-    Preprocess / preprocessRules := Seq(("\\.java\\.scala".r, _ => ".java")),
-    Paradox / siteSubdirName := s"docs/akka-persistence-cassandra/${if (isSnapshot.value) "snapshot" else version.value}",
-    Compile / paradoxProperties ++= Map(
-        "akka.version" -> Dependencies.AkkaVersion,
-        "project.url" -> "https://doc.akka.io/docs/akka-persistence-cassandra/current/",
-        "canonical.base_url" -> "https://doc.akka.io/docs/akka-persistence-cassandra/current",
-        // Akka
-        "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.AkkaVersion}/%s",
-        "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.AkkaVersion}/",
-        "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.AkkaVersion}/",
-        // Cassandra
-        "extref.cassandra.base_url" -> s"https://cassandra.apache.org/doc/${Dependencies.CassandraVersionInDocs}/%s",
-        // Java
-        "javadoc.base_url" -> "https://docs.oracle.com/javase/8/docs/api/",
-        // Scala
-        "scaladoc.scala.base_url" -> s"https://www.scala-lang.org/api/${scalaBinaryVersion.value}.x/",
-        "scaladoc.akka.persistence.cassandra.base_url" -> {
-          val docsHost = sys.env.get("CI").map(_ => "https://doc.akka.io").getOrElse("")
-          s"$docsHost/api/akka-persistence-cassandra/${if (isSnapshot.value) "snapshot" else version.value}/"
-        }),
-    paradoxGroups := Map("Language" -> Seq("Java", "Scala")),
-    resolvers += Resolver.jcenterRepo,
-    publishRsyncArtifact := makeSite.value -> "www/",
-    publishRsyncHost := "akkarepo@gustav.akka.io")
 
 def akkaImport(packageName: String = "akka.*") =
   versionedImport(packageName, "2.4", "2.5")

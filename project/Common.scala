@@ -1,4 +1,3 @@
-import com.lightbend.paradox.projectinfo.ParadoxProjectInfoPluginKeys._
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport._
 import de.heikoseeberger.sbtheader._
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
@@ -34,7 +33,6 @@ object Common extends AutoPlugin {
       description := "A Cassandra plugin for Akka Persistence.")
 
   override lazy val projectSettings = Seq(
-    projectInfoVersion := (if (isSnapshot.value) "snapshot" else version.value),
     crossVersion := CrossVersion.binary,
     crossScalaVersions := Dependencies.ScalaVersions,
     scalaVersion := Dependencies.Scala212,
